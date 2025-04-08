@@ -1,7 +1,13 @@
-from fastapi import FastAPI 
+from fastapi import FastAPI
 
-app = FastAPI()  
+from app.api.endpoints import accounts, authors, books
 
-@app.get('/')  
-def read_root():  
+app = FastAPI()
+app.include_router(accounts.router)
+app.include_router(books.router)
+app.include_router(authors.router)
+
+
+@app.get('/')
+def read_root():
     return {'message': 'Olá Mundo!'}
