@@ -1,6 +1,8 @@
 from contextlib import contextmanager
 from datetime import datetime
 
+import factory
+import factory.fuzzy
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, event
@@ -9,7 +11,16 @@ from sqlalchemy.pool import StaticPool
 
 from app.database import get_session
 from app.main import app
-from app.models.models import table_registry
+from app.models.models import Account, table_registry
+
+
+class AccountFactory(factory.Factory):
+    class Meta:
+        model = Account
+
+    username = factory.sequence(lambda n: f'test{n}')
+    email = factory.lazy_attribute(lambda obj: f'{obj.username}@test.com')
+    password = factory.lazy_attribute(lambda obj: f'{obj.username}@gr87')
 
 
 @contextmanager
@@ -58,3 +69,14 @@ def session():
         yield session
 
     table_registry.metadata.drop_all(engine)
+
+
+@pytest.fixture
+def account(session):
+    account = AccountFactory()
+
+    session.add(account)
+    session.commit()
+    session.refresh(account)
+
+    return account
