@@ -11,3 +11,7 @@ class AccountPublic(BaseModel):
     id: int
     email: EmailStr
     username: str
+
+
+class AccountList(BaseModel):
+    accounts: list[AccountPublic]
